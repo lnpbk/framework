@@ -159,6 +159,13 @@ class Validator implements ValidatorContract
     protected $stopOnFirstFailure = false;
 
     /**
+     * Indicates if all validated inputs should bail on failure.
+     *
+     * @var bool
+     */
+    protected static $bailByDefault = false;
+
+    /**
      * Indicates that unvalidated array keys should be excluded, even if the parent array was validated.
      *
      * @var bool
@@ -305,6 +312,15 @@ class Validator implements ValidatorContract
         $this->customAttributes = $customAttributes;
 
         $this->setRules($rules);
+    }
+
+    /**
+     * Set whether the validator should bail by default
+     * 
+     * @return void
+     */
+    public static function bailByDefault() {
+        static::$bailByDefault = true;
     }
 
     /**
@@ -816,7 +832,7 @@ class Validator implements ValidatorContract
     {
         $cleanedAttribute = $this->replacePlaceholderInString($attribute);
 
-        if ($this->hasRule($attribute, ['Bail'])) {
+        if (static::$bailByDefault || $this->hasRule($attribute, ['Bail'])) {
             return $this->messages->has($cleanedAttribute);
         }
 
